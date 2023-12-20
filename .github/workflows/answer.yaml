@@ -2,8 +2,7 @@ name: Validate answers
 
 on:
   repository_dispatch:
-    types:
-      - answer_submission
+    types: [answer_submission]
 
 jobs:
   validate:
