@@ -9,11 +9,7 @@ jobs:
   validate:
     runs-on: ubuntu-22.04
     steps:
-      - run: go version
-      - run: 'echo "payload: ${{ toJson(github.event.client_payload) }}"'
       - env:
-          JSON_DOC: ${{ toJSON(github.event.client_payload) }}
+          CLIENT_PAYLOAD: ${{ toJSON(github.event.client_payload) }}
         run: |
-          printf '%s\n' "$JSON_DOC" > foo.json
-          cat foo.json
-      
+          node answer_validator/index.js
