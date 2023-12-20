@@ -8,5 +8,5 @@ jobs:
   validate:
     runs-on: ubuntu-22.04
     steps:
-      - run: echo hello
+      - run: 'echo "payload: ${{ toJson(github.event.client_payload) }}"'
       
