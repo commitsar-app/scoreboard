@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 
 // took from https://gist.github.com/junderw/1d41158403978ba0363e5868d4f434d9
 async function decrypt(ciphertext, password, difficulty = 10) {
