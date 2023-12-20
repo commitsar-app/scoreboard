@@ -1,6 +1,7 @@
 name: Validate answers
 
 on:
+  workflow_dispatch:
   repository_dispatch:
     types: [answer_submission]
 
@@ -8,5 +9,6 @@ jobs:
   validate:
     runs-on: ubuntu-22.04
     steps:
+      - run: go version
       - run: 'echo "payload: ${{ toJson(github.event.client_payload) }}"'
       
