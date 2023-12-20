@@ -12,5 +12,4 @@ jobs:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
       - env:
           CLIENT_PAYLOAD: ${{ toJSON(github.event.client_payload) }}
-        run: |
-          node answer_validator/index.js
+        run: node answer_validator/index.js
