@@ -1,0 +1,13 @@
+name: Validate answers
+
+on:
+  repository_dispatch:
+    types:
+      - answer_submission
+
+jobs:
+  validate:
+    runs-on: ubuntu-22.04
+    steps:
+      - run: echo hello
+      
