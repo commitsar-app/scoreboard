@@ -56,11 +56,47 @@ async function pbkdf2(message, salt, iterations, keyLen, algorithm) {
 
 const CLIENT_PAYLOAD = process.env.ENCRYPTED_CLIENT_PAYLOAD;
 if (!CLIENT_PAYLOAD) {
-  throw new Error("UNEXPECTED: CLIENT_PAYLOAD environment variable is not set");
+	throw new Error("UNEXPECTED: CLIENT_PAYLOAD environment variable is not set");
+}
+const ENCRYPTION_PASSWORD = process.env.ENCRYPTION_PASSWORD;
+if (!ENCRYPTION_PASSWORD) {
+	throw new Error("UNEXPECTED: ENCRYPTION_PASSWORD environment variable is not set");
 }
 
 (async () => {
-  const decrypted = await decrypt(CLIENT_PAYLOAD, process.env.ENCRYPTION_PASSWORD);
-  console.log(decrypted);
-  console.log(JSON.parse(decrypted));
+	let eventPayload;
+	try {
+		eventPayload = JSON.parse(await decrypt(CLIENT_PAYLOAD, ENCRYPTION_PASSWORD));
+	} catch (e) {
+		console.error(`Could not decrypt payload: ${e}. Check your ENCRYPTION_PASSWORD.`);
+		process.exit(1);
+	}
+	const advisory = eventPayload?.repository_advisory;
+	if(!advisory) {
+		console.error("No advisory found in payload.");
+		process.exit(1);
+	}
+	const problemId = advisory.summary?.trim();
+	if(!problemId) {
+		console.error("No problem ID found in advisory.");
+		process.exit(1);
+	}
+	// check if the problem id is an integer
+	const problemIdNum = Number(problemId);
+	if(!Number.isInteger(problemIdNum)) {
+		console.error("Problem ID is not an integer.");
+		process.exit(1);
+	}
+	const sender = advisory.sender?.login;
+	if(!sender) {
+		console.error("No sender found in payload.");
+		process.exit(1);
+	}
+	const answer = advisory.description;
+	if(!answer) {
+		console.error("No answer found in payload.");
+		process.exit(1);
+	}
+
+	console.log(`Problem ID: ${problemId}\nSender: ${sender}\nAnswer: ${answer}`);
 })();

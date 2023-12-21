@@ -17,4 +17,4 @@ jobs:
       - env:
           ENCRYPTED_CLIENT_PAYLOAD: ${{ github.event.client_payload.encryptedBody }}
           ENCRYPTION_PASSWORD: ${{ secrets.ENCRYPTION_PASSWORD }}
-        run: node answer_validator/index.js
+        run: node scoreboard/answer_validator/index.js
