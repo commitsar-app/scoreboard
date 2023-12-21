@@ -5,6 +5,6 @@ if [ "$INPUT" = "sanity check" ]; then
     echo 'Answer is correct, congratulations!'
     exit 0
 else
-    echo "Answer is not correct: expected 'sanity check', got '$INPUT'"
+    echo "Answer is not correct: expected 'sanity check', got '$(echo $INPUT | base64 -)' (Base64 encoded)"
     exit 1
 fi

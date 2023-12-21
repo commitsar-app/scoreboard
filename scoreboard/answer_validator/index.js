@@ -1,4 +1,5 @@
 const { decrypt } = require("./encryption.js");
+const crypto = require("crypto");
 const cp = require("child_process");
 
 const CLIENT_PAYLOAD = process.env.ENCRYPTED_CLIENT_PAYLOAD;
@@ -11,6 +12,9 @@ if (!ENCRYPTION_PASSWORD) {
 }
 
 (async () => {
+	const stopCommandId = crypto.randomUUID();
+	// disable the Actions commands to prevent the garbages from being parsed as commands
+	console.log(`::stop-commands::${stopCommandId}`);
 	try {
 		let eventPayload;
 		try {
@@ -24,7 +28,9 @@ if (!ENCRYPTION_PASSWORD) {
 		}
 
 		await runValidation(eventPayload);
+		console.log(`::${stopCommandId}::`);
 	} catch (e) {
+		console.log(`::${stopCommandId}::`);
 		console.log(`::error::${e}`);
 		process.exit(1);
 	}
