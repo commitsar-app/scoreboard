@@ -1,2 +1,4 @@
 ## Solvers for challenge 1
-- @commitsar-app
+| User |
+| ---- |
+| [@commitsar-app](https://github.com/commitsar-app) |
