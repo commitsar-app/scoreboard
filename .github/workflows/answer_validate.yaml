@@ -24,7 +24,7 @@ jobs:
         uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392
         with:
           name: result
-          path: result.zip
+          path: result.json
       - name: 'Set result'
         env: 
           CONCLUSION: ${{ steps.validation.outcome }}
