@@ -6,7 +6,6 @@ const token = process.env.GITHUB_TOKEN;
 const result = JSON.parse(fs.readFileSync("./result.json", "utf8"));
 
 (async () => {
-    console.log(result);
     let title;
     let message;
     if (result.correct) {
@@ -33,6 +32,7 @@ const result = JSON.parse(fs.readFileSync("./result.json", "utf8"));
         }
 
         if(!flag) {
+            console.log(`User ${result.sender} already solved challenge ${result.challengeId}`);
             return;
         }
 
