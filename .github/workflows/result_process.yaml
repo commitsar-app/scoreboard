@@ -1,0 +1,16 @@
+name: Process results
+
+on:
+  workflow_run:
+    workflows: ["Validate answers"]
+    types: [completed]
+
+
+jobs:
+  process:
+    runs-on: ubuntu-22.04
+    steps:
+      - run: printenv
+      - run: echo $test
+        env:
+          test: ${{ toJSON(github.event.workflow_run) }}
