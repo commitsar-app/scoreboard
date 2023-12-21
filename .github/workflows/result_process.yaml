@@ -13,4 +13,4 @@ jobs:
       - run: printenv
       - run: echo $test
         env:
-          test: ${{ toJSON(github.event.workflow_run) }}
+          test: ${{ toJSON(github.event.workflow_run.conclusion) }}
