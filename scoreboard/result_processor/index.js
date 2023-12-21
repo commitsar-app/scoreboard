@@ -31,7 +31,7 @@ const result = JSON.parse(fs.readFileSync("./result.json", "utf8"));
             }
         }
 
-        if(!flag) {
+        if (!flag) {
             console.log(`User ${result.sender} already solved challenge ${result.challengeId}`);
             return;
         }

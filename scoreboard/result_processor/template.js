@@ -1,4 +1,4 @@
-function answerFailedTemplate (sender, challengeId, answerUrl, error) {
+function answerFailedTemplate(sender, challengeId, answerUrl, error) {
     return `
 Hello @${sender}!
 
@@ -13,7 +13,7 @@ If you believe this is an error, please contact [RyotaK](https://twitter.com/ryo
 `;
 }
 
-function answerCorrectTemplate (sender, challengeId, answerUrl) {
+function answerCorrectTemplate(sender, challengeId, answerUrl) {
     return `
 Hello @${sender}!
 
