@@ -27,7 +27,7 @@ jobs:
           path: result.zip
       - name: 'Set result'
         env: 
-          CONCLUSION: ${{ steps.validation.outputs.conclusion }}
+          CONCLUSION: ${{ steps.validation.outcome }}
         run: |
           if [ "$CONCLUSION" == "success" ]; then
             echo "The answer was correct!"
