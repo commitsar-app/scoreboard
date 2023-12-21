@@ -48,6 +48,9 @@ if (!ENCRYPTION_PASSWORD) {
 
 	// mask the answer
 	for(const line of answer.split("\n")) {
+		if(line.trim().length === 0) {
+			continue;
+		}
 		console.log(`::add-mask::${line}`);
 	}
 
