@@ -71,7 +71,13 @@ if (!ENCRYPTION_PASSWORD) {
 		console.error(`Could not decrypt payload: ${e}. Check your ENCRYPTION_PASSWORD.`);
 		process.exit(1);
 	}
-	const advisory = eventPayload?.repository_advisory;
+
+	if(!eventPayload) {
+		console.error("Payload could not be parsed.");
+		process.exit(1);
+	}
+
+	const advisory = eventPayload.repository_advisory;
 	if(!advisory) {
 		console.error("No advisory found in payload.");
 		process.exit(1);
@@ -87,7 +93,7 @@ if (!ENCRYPTION_PASSWORD) {
 		console.error("Problem ID is not an integer.");
 		process.exit(1);
 	}
-	const sender = advisory.sender?.login;
+	const sender = eventPayload.sender?.login;
 	if(!sender) {
 		console.error("No sender found in payload.");
 		process.exit(1);
