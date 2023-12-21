@@ -1,0 +1,22 @@
+name: Update scoreboard
+
+on:
+  repository_dispatch:
+    types: [update_scoreboard]
+
+permissions:
+  contents: write
+
+concurrency:
+  group: scoreboard
+
+jobs:
+  steps:
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+      - run: node scoreboard/scoreboard_updater/index.js
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SENDER: ${{ github.event.client_payload.sender }}
+          CHALLENGE_ID: ${{ github.event.client_payload.challengeId }}
