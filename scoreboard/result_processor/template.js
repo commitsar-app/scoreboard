@@ -13,4 +13,15 @@ If you believe this is an error, please contact [RyotaK](https://twitter.com/ryo
 `;
 }
 
+function answerCorrectTemplate (sender, challengeId, answerUrl) {
+    return `
+Hello @${sender}!
+
+Congratulations! [Your answer](${answerUrl}) for challenge ${challengeId} is correct!
+
+The scoreboard will be updated within a few minutes ;)
+`;
+}
+
 exports.answerFailedTemplate = answerFailedTemplate;
+exports.answerCorrectTemplate = answerCorrectTemplate;
