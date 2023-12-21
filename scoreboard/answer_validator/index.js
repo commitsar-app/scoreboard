@@ -10,24 +10,25 @@ if (!ENCRYPTION_PASSWORD) {
 	throw new Error("UNEXPECTED: ENCRYPTION_PASSWORD environment variable is not set");
 }
 
-let eventPayload;
-try {
-	eventPayload = JSON.parse(await decrypt(CLIENT_PAYLOAD, ENCRYPTION_PASSWORD));
-} catch (e) {
-	throw new Error(`UNEXPECTED: Could not decrypt payload: ${e}. Check your ENCRYPTION_PASSWORD.`);
-}
+(async () => {
+	try {
+		let eventPayload;
+		try {
+			eventPayload = JSON.parse(await decrypt(CLIENT_PAYLOAD, ENCRYPTION_PASSWORD));
+		} catch (e) {
+			throw new Error(`UNEXPECTED: Could not decrypt payload: ${e}. Check your ENCRYPTION_PASSWORD.`);
+		}
 
-if (!eventPayload) {
-	throw new Error("UNEXPECTED: Payload could not be parsed.");
-}
+		if (!eventPayload) {
+			throw new Error("UNEXPECTED: Payload could not be parsed.");
+		}
 
-try {
-	await runValidation(eventPayload);
-} catch (e) {
-	console.log(`::error::${e}`);
-	process.exit(1);
-}
-
+		await runValidation(eventPayload);
+	} catch (e) {
+		console.log(`::error::${e}`);
+		process.exit(1);
+	}
+})();
 
 async function runValidation(eventPayload) {
 
