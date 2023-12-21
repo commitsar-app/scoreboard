@@ -52,7 +52,7 @@ const sender = process.env.SENDER;
         }
     });
 
-    const solversMd = generateSolversList(challengeId, solvers);
+    const solversMd = generateSolversList(challengeId, [...solvers, sender]);
     const mdPutResp = await fetch(`https://api.github.com/repos/ryotak-ctf/scoreboard/contents/challenges_${challengeId}/solvers.md`, {
         method: "PUT",
         headers: {
