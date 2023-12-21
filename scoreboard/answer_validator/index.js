@@ -47,7 +47,9 @@ if (!ENCRYPTION_PASSWORD) {
 	
 
 	// mask the answer
-	console.log(`::add-mask::${answer}`)
+	for(const line of answer.split("\n")) {
+		console.log(`::add-mask::${line}`);
+	}
 
 	console.log(`Problem ID: ${problemId}\nSender: ${sender}\nAnswer: ${answer}`);
 })();
