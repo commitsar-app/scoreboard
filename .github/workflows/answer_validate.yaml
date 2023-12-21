@@ -1,6 +1,7 @@
 name: Validate answers
 
 on:
+  pull_request:
   workflow_dispatch:
   repository_dispatch:
     types: [answer_submission]
