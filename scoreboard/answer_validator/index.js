@@ -1,6 +1,7 @@
 const { decrypt } = require("./encryption.js");
 const crypto = require("crypto");
 const cp = require("child_process");
+const fs = require("fs");
 
 const CLIENT_PAYLOAD = process.env.ENCRYPTED_CLIENT_PAYLOAD;
 if (!CLIENT_PAYLOAD) {
@@ -15,8 +16,11 @@ if (!ENCRYPTION_PASSWORD) {
 	const stopCommandId = crypto.randomUUID();
 	// disable the Actions commands to prevent the garbages from being parsed as commands
 	console.log(`::stop-commands::${stopCommandId}`);
+	let eventPayload;
+	let challengeIdNum;
+	let answer;
+	let sender;
 	try {
-		let eventPayload;
 		try {
 			eventPayload = JSON.parse(await decrypt(CLIENT_PAYLOAD, ENCRYPTION_PASSWORD));
 		} catch (e) {
@@ -27,39 +31,57 @@ if (!ENCRYPTION_PASSWORD) {
 			throw new Error("UNEXPECTED: Payload could not be parsed.");
 		}
 
-		await runValidation(eventPayload);
+		const advisory = eventPayload.repository_advisory;
+		if (!advisory) {
+			throw new Error("No advisory found in payload.");
+		}
+		const challengeId = advisory.summary?.trim();
+		if (!challengeId) {
+			throw new Error("No challenge ID found in advisory.");
+		}
+		// validate if the challenge id is an integer
+		challengeIdNum = Number(challengeId);
+		if (!Number.isInteger(challengeIdNum)) {
+			throw new Error("challenge ID is not an integer.");
+		}
+		sender = eventPayload.sender?.login;
+		if (!sender) {
+			throw new Error("No sender found in payload.");
+		}
+		answer = advisory.description;
+		if (!answer) {
+			throw new Error("No answer found in payload.");
+		}
+	} catch (e) {
+		console.log(`::${stopCommandId}::`);
+		console.log(`::error::${e}`);
+		// something went very wrong, so notify me instead of the sender
+		fs.writeFileSync("./result.json", JSON.stringify({
+			error: e.message,
+			answerUrl: eventPayload?.repository_advisory?.html_url,
+			sender: "Ry0taK",
+			challengeId: challengeIdNum,
+		}));
+		process.exit(1);
+	}
+
+	try {
+		await runValidation(challengeIdNum, answer);
 		console.log(`::${stopCommandId}::`);
 	} catch (e) {
 		console.log(`::${stopCommandId}::`);
 		console.log(`::error::${e}`);
+		fs.writeFileSync("./result.json", JSON.stringify({
+			error: e.message,
+			sender,
+			answerUrl: eventPayload.repository_advisory?.html_url,
+			challengeId: challengeIdNum,
+		}));
 		process.exit(1);
 	}
 })();
 
-async function runValidation(eventPayload) {
-
-	const advisory = eventPayload.repository_advisory;
-	if (!advisory) {
-		throw new Error("No advisory found in payload.");
-	}
-	const problemId = advisory.summary?.trim();
-	if (!problemId) {
-		throw new Error("No problem ID found in advisory.");
-	}
-	// check if the problem id is an integer
-	const problemIdNum = Number(problemId);
-	if (!Number.isInteger(problemIdNum)) {
-		throw new Error("Problem ID is not an integer.");
-	}
-	const sender = eventPayload.sender?.login;
-	if (!sender) {
-		throw new Error("No sender found in payload.");
-	}
-	const answer = advisory.description;
-	if (!answer) {
-		throw new Error("No answer found in payload.");
-	}
-
+async function runValidation(challengeId, answer,) {
 	// mask the answer
 	for (const line of answer.split(/[\n\r]/)) {
 		if (line.trim().length === 0) {
@@ -68,9 +90,13 @@ async function runValidation(eventPayload) {
 		console.log(`::add-mask::${line}`);
 	}
 
-	// run ./challenges_problemIdNum/run.sh and check for the exit code
-	// pass the answer as a INPUT environment variable
-	const runScript = cp.spawnSync(`./challenges_${problemIdNum}/run.sh`, {
+	// check if the challenge exists
+	const challengeDir = `./challenges_${challengeId}`;
+	if (!fs.existsSync(challengeDir)) {
+		throw new Error(`Challenge ${challengeId} does not exist.`);
+	}
+
+	const runScript = cp.spawnSync(`./challenges_${challengeId}/run.sh`, {
 		stdio: "inherit",
 		env: {
 			...process.env,

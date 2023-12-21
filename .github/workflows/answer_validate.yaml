@@ -5,6 +5,7 @@ on:
   repository_dispatch:
     types: [answer_submission]
 
+# make sure this is read-only since the user might be compromise this workflow
 permissions:
   contents: read
 
@@ -17,3 +18,21 @@ jobs:
           ENCRYPTED_CLIENT_PAYLOAD: ${{ github.event.client_payload.encryptedBody }}
           ENCRYPTION_PASSWORD: ${{ secrets.ENCRYPTION_PASSWORD }}
         run: node scoreboard/answer_validator/index.js
+        continue-on-error: true
+        id: validation
+      - name: 'Upload result'
+        uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392
+        with:
+          name: result
+          path: result.zip
+      - name: 'Set result'
+        env: 
+          CONCLUSION: ${{ steps.validation.outputs.conclusion }}
+        run: |
+          if [ "$CONCLUSION" == "success" ]; then
+            echo "The answer was correct!"
+            exit 0
+          else
+            echo "The answer was incorrect..."
+            exit 1
+          fi

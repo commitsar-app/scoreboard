@@ -10,11 +10,41 @@ jobs:
   process:
     runs-on: ubuntu-22.04
     steps:
-      - if: ${{ github.event.workflow_run.conclusion == 'success' }}
-        run: echo $test
+      # make sure this workflow is only triggered by the repository_dispatch event, as the pull_request event can be used to trigger this workflow as well
+      - if: ${{ github.event.workflow_run.event != 'repository_dispatch'}}
+        run: |
+          echo "This workflow should only be triggered by the repository_dispatch event, but was triggered by the $TRIGGER_EVENT event."
+          exit 1
         env:
-          test: ${{ toJSON(github.event.workflow_run) }}
-      - if: ${{ github.event.workflow_run.conclusion == 'failure' }}
-        run: echo $test
+          TRIGGER_EVENT: ${{ github.event.workflow_run.event }}
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+
+      - name: 'Download result'
+        uses: actions/github-script@60a0d83039c74a4aee543508d2ffcb1c3799cdea
+        with:
+          script: |
+            let allArtifacts = await github.rest.actions.listWorkflowRunArtifacts({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               run_id: context.payload.workflow_run.id,
+            });
+            let matchArtifact = allArtifacts.data.artifacts.filter((artifact) => {
+              return artifact.name == "result"
+            })[0];
+            let download = await github.rest.actions.downloadArtifact({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               artifact_id: matchArtifact.id,
+               archive_format: 'zip',
+            });
+            let fs = require('fs');
+            fs.writeFileSync(`${process.env.GITHUB_WORKSPACE}/result.zip`, Buffer.from(download.data));
+
+      - name: 'Unzip result'
+        # I don't want to deal with symlinks, so just pipe the output to a file
+        run: unzip -p result.zip > result.json
+
+
+      - run: node scoreboard/result_processor/index.js
         env:
-          test: ${{ toJSON(github.event.workflow_run) }}
+          CONCLUSION: ${{ github.event.workflow_run.conclusion }}
