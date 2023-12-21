@@ -45,9 +45,8 @@ if (!ENCRYPTION_PASSWORD) {
 		process.exit(1);
 	}
 	
-
 	// mask the answer
-	for(const line of answer.split("\n")) {
+	for(const line of answer.split(/[\n\r]/)) {
 		if(line.trim().length === 0) {
 			continue;
 		}
