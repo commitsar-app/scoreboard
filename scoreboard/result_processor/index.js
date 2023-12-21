@@ -2,6 +2,7 @@ const template = require("./template");
 
 const fs = require("fs");
 
+const actionsRunUrl = process.env.ACTIONS_RUN_URL;
 const token = process.env.GITHUB_TOKEN;
 const result = JSON.parse(fs.readFileSync("./result.json", "utf8"));
 
@@ -10,7 +11,7 @@ const result = JSON.parse(fs.readFileSync("./result.json", "utf8"));
     let message;
     if (result.correct) {
         title = `Answer for challenge ${result.challengeId} is correct`;
-        message = template.answerCorrectTemplate(result.sender, result.challengeId, result.answerUrl);
+        message = template.answerCorrectTemplate(result.sender, result.challengeId, result.answerUrl, actionsRunUrl);
 
         // stats repository file
         const contentResp = await fetch(`https://api.github.com/repos/ryotak-ctf/scoreboard/contents/challenges_${result.challengeId}/solvers.json`, {
@@ -56,7 +57,7 @@ const result = JSON.parse(fs.readFileSync("./result.json", "utf8"));
         }
     } else {
         title = `Answer for challenge ${result.challengeId} failed`;
-        message = template.answerFailedTemplate(result.sender, result.challengeId, result.answerUrl, result.error);
+        message = template.answerFailedTemplate(result.sender, result.challengeId, result.answerUrl, actionsRunUrl, result.error);
     }
     let resp = await fetch("https://api.github.com/repos/ryotak-ctf/scoreboard/issues", {
         method: "POST",

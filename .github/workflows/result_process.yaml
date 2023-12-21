@@ -51,3 +51,4 @@ jobs:
         env:
           # we need to use a personal access token here, as the GITHUB_TOKEN does not have permissions to trigger repository_dispatch events
           GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          ACTIONS_RUN_URL: ${{ github.event.workflow_run.html_url }}
