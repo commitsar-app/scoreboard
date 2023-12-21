@@ -49,4 +49,5 @@ jobs:
 
       - run: node scoreboard/result_processor/index.js
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # we need to use a personal access token here, as the GITHUB_TOKEN does not have permissions to trigger repository_dispatch events
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}

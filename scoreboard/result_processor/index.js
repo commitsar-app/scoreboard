@@ -28,7 +28,7 @@ const result = JSON.parse(fs.readFileSync("./result.json", "utf8"));
             })
         });
         if (!resp.ok) {
-            throw new Error(`Failed to dispatch an event: ${resp.status} ${resp.statusText}`);
+            throw new Error(`Failed to dispatch an event: ${resp.status} ${resp.statusText} ${await resp.text()}`);
         }
     } else {
         title = `Answer for challenge ${result.challengeId} failed`;
