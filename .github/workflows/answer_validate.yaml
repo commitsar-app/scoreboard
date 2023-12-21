@@ -12,7 +12,6 @@ jobs:
   validate:
     runs-on: ubuntu-22.04
     steps:
-      - run: printenv
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
       - env:
           ENCRYPTED_CLIENT_PAYLOAD: ${{ github.event.client_payload.encryptedBody }}
