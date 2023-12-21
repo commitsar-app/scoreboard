@@ -11,7 +11,7 @@ concurrency:
   group: scoreboard
 
 jobs:
-  steps:
+  update:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11

@@ -12,6 +12,30 @@ const result = JSON.parse(fs.readFileSync("./result.json", "utf8"));
     if (result.correct) {
         title = `Answer for challenge ${result.challengeId} is correct`;
         message = template.answerCorrectTemplate(result.sender, result.challengeId, result.answerUrl);
+
+        // stats repository file
+        const contentResp = await fetch(`https://api.github.com/repos/ryotak-ctf/scoreboard/contents/challenges_${result.challengeId}/solvers.json`, {
+            headers: {
+                // retrieve the raw content instead of the base64-encoded content
+                Accept: 'application/vnd.github.raw'
+            }
+        });
+
+
+        let flag;
+        if (contentResp.status === 404) {
+            flag = true;
+        } else {
+            const solvers = await contentResp.json();
+            if (!solvers.includes(result.sender)) {
+                flag = true;
+            }
+        }
+
+        if(!flag) {
+            return;
+        }
+
         const resp = await fetch("https://api.github.com/repos/ryotak-ctf/scoreboard/dispatches", {
             method: "POST",
             headers: {
@@ -28,7 +52,7 @@ const result = JSON.parse(fs.readFileSync("./result.json", "utf8"));
             })
         });
         if (!resp.ok) {
-            throw new Error(`Failed to dispatch an event: ${resp.status} ${resp.statusText} ${await resp.text()}`);
+            throw new Error(`Failed to dispatch an event: ${resp.status} ${resp.statusText}`);
         }
     } else {
         title = `Answer for challenge ${result.challengeId} failed`;
