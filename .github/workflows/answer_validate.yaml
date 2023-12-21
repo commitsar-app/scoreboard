@@ -20,6 +20,7 @@ jobs:
         run: node scoreboard/answer_validator/index.js
         continue-on-error: true
         id: validation
+      # I know this is spoofable if the user compromised this workflow, but I had no better ideas for now :(
       - name: 'Upload result'
         uses: actions/upload-artifact@c7d193f32edcb7bfad88892161225aeda64e9392
         with:

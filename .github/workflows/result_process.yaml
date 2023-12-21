@@ -5,6 +5,8 @@ on:
     workflows: ["Validate answers"]
     types: [completed]
 
+permissions:
+  issues: write
 
 jobs:
   process:
@@ -48,3 +50,4 @@ jobs:
       - run: node scoreboard/result_processor/index.js
         env:
           CONCLUSION: ${{ github.event.workflow_run.conclusion }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
