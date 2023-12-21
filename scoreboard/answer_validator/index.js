@@ -15,7 +15,6 @@ if (!ENCRYPTION_PASSWORD) {
 (async () => {
 	const stopCommandId = crypto.randomUUID();
 	// disable the Actions commands to prevent the garbages from being parsed as commands
-	console.log(`::stop-commands::${stopCommandId}`);
 	let eventPayload;
 	let challengeIdNum;
 	let answer;
@@ -53,7 +52,6 @@ if (!ENCRYPTION_PASSWORD) {
 			throw new Error("No answer found in payload.");
 		}
 	} catch (e) {
-		console.log(`::${stopCommandId}::`);
 		console.log(`::error::${e}`);
 		// something went very wrong, so notify me instead of the sender
 		fs.writeFileSync("./result.json", JSON.stringify({
@@ -61,23 +59,29 @@ if (!ENCRYPTION_PASSWORD) {
 			answerUrl: eventPayload?.repository_advisory?.html_url,
 			sender: "Ry0taK",
 			challengeId: challengeIdNum,
+			correct: false,
 		}));
-		process.exit(1);
+		return;
 	}
 
 	try {
 		await runValidation(challengeIdNum, answer);
-		console.log(`::${stopCommandId}::`);
+		fs.writeFileSync("./result.json", JSON.stringify({
+			answerUrl: eventPayload?.repository_advisory?.html_url,
+			sender,
+			challengeId: challengeIdNum,
+			correct: true,
+		}));
 	} catch (e) {
-		console.log(`::${stopCommandId}::`);
 		console.log(`::error::${e}`);
 		fs.writeFileSync("./result.json", JSON.stringify({
 			error: e.message,
 			sender,
 			answerUrl: eventPayload.repository_advisory?.html_url,
 			challengeId: challengeIdNum,
+			correct: false,
 		}));
-		process.exit(1);
+		return;
 	}
 })();
 

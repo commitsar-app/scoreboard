@@ -26,14 +26,3 @@ jobs:
         with:
           name: result
           path: result.json
-      - name: 'Set result'
-        env: 
-          CONCLUSION: ${{ steps.validation.outcome }}
-        run: |
-          if [ "$CONCLUSION" == "success" ]; then
-            echo "The answer was correct!"
-            exit 0
-          else
-            echo "The answer was incorrect..."
-            exit 1
-          fi

@@ -2,15 +2,14 @@ const template = require("./template");
 
 const fs = require("fs");
 
-const conclusion = process.env.CONCLUSION;
 const token = process.env.GITHUB_TOKEN;
 const result = JSON.parse(fs.readFileSync("./result.json", "utf8"));
 
 (async () => {
     console.log(result);
-    if (conclusion === "success") {
+    if (result.correct) {
 
-    } else if (conclusion === "failure") {
+    } else {
         const message = template.answerFailedTemplate(result.sender, result.challengeId, result.answerUrl, result.error);
         let resp = await fetch("https://api.github.com/repos/ryotak-ctf/scoreboard/issues", {
             method: "POST",
@@ -28,7 +27,6 @@ const result = JSON.parse(fs.readFileSync("./result.json", "utf8"));
             throw new Error(`Failed to create an issue: ${resp.status} ${resp.statusText}`);
         }
         const issue = await resp.json();
-        // close the issue
         resp = await fetch(`https://api.github.com/repos/ryotak-ctf/scoreboard/issues/${issue.number}`, {
             method: "PATCH",
             headers: {
@@ -43,8 +41,5 @@ const result = JSON.parse(fs.readFileSync("./result.json", "utf8"));
         if (!resp.ok) {
             throw new Error(`Failed to close the issue: ${resp.status} ${resp.statusText}`);
         }
-
-    } else {
-        throw new Error(`UNEXPECTED: conclusion is not success or failure: ${conclusion}`);
     }
 })();
