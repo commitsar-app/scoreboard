@@ -5,6 +5,9 @@ on:
   repository_dispatch:
     types: [answer_submission]
 
+permissions:
+  contents: read
+
 jobs:
   validate:
     runs-on: ubuntu-22.04
