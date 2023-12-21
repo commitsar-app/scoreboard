@@ -1,6 +1,9 @@
 function answerFailedTemplate (sender, challengeId, answerUrl, error) {
     return `
-Hello @${sender}! [Your answer](${answerUrl}) for challenge ${challengeId} failed to pass the validation.
+Hello @${sender}!
+
+[Your answer](${answerUrl}) for challenge ${challengeId} failed to pass the validation.
+
 Please check the error message below for more details:
 \`\`\`
 ${error}
